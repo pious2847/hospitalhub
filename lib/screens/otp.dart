@@ -34,7 +34,7 @@ class _OptVerificationState extends State<OptVerification> {
 
     try {
       final response = await dio.post(
-        "$APIURL//verify-otp",
+        "$APIURL/verify-otp",
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',

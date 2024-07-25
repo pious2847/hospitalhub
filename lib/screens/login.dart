@@ -48,7 +48,6 @@ class _SigninState extends State<Signin> {
       print('Response: $response');
 
       if (response.statusCode == 200) {
-        // print('Userid ' + response.data);
         final prefs = await SharedPreferences.getInstance();
         final userId = await response.data['doctor']['_id'];
         await saveUserDataToLocalStorage(userId);
@@ -63,9 +62,7 @@ class _SigninState extends State<Signin> {
         );
         const resMsg = 'Welcome Back !!!';
         ToastMsg.showSuccessToast(" $resMsg,");
-
-        // Dismiss the loading dialog after successful login
-      } else if (response.statusCode == 400) {
+      } else  {
         print("Invalid response ${response.statusCode}: ${response.data}");
         ToastMsg.showErrorToast("${response.data['message']}");
       }

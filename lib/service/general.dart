@@ -40,8 +40,8 @@ Future<Map<String, dynamic>?> getUser() async {
 
     // Assuming the user information is stored in the 'user' claim
     // Adjust this based on your actual token structure
-    print("Then decorded Token : ${decodedToken['user']}");
-    return decodedToken['user'];
+    print("Then decorded Token : ${decodedToken['doctor']}");
+    return decodedToken['doctor'];
     // if (decodedToken.containsKey('user')) {
     // } else {
     //   print('User information not found in token');

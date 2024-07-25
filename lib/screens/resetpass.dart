@@ -153,10 +153,7 @@ class _ResetPassState extends State<ResetPass> {
                         const SizedBox(height: 24),
                         TextFormField(
                           controller:
-                              TextEditingController(text: user.password),
-                          onChanged: (value) {
-                            user.password = value;
-                          },
+                              TextEditingController(text: ''),
                           obscureText: _obscureText,
                           decoration: InputDecoration(
                             labelText: 'Confirm Password',
