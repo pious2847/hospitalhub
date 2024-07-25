@@ -31,12 +31,6 @@ class _SigninState extends State<Signin> {
       _isLoading = true; // Set loading state to true
     });
     final dio = Dio();
-    print(
-      "email" + user.email,
-    );
-    print(
-      'Password' + user.password,
-    );
     try {
       final response = await dio.post(
         "$APIURL/login",
@@ -50,14 +44,14 @@ class _SigninState extends State<Signin> {
           'password': user.password,
         },
       );
+
       print('Response: $response');
 
       if (response.statusCode == 200) {
         // print('Userid ' + response.data);
-
         final prefs = await SharedPreferences.getInstance();
-
-        await saveUserDataToLocalStorage(response.data['userId']);
+        final userId = await response.data['doctor']['_id'];
+        await saveUserDataToLocalStorage(userId);
 
         prefs.setBool('showHome', true);
         prefs.setString('jwt_token', '${response.data['token']}');
@@ -71,12 +65,9 @@ class _SigninState extends State<Signin> {
         ToastMsg.showSuccessToast(" $resMsg,");
 
         // Dismiss the loading dialog after successful login
-      } else {
+      } else if (response.statusCode == 400) {
         print("Invalid response ${response.statusCode}: ${response.data}");
-        ToastMsg.showErrorToast("Login Failed Please try again");
-        setState(() {
-          _isLoading = false; // Set loading state to true
-        });
+        ToastMsg.showErrorToast("${response.data['message']}");
       }
     } catch (e) {
       print("Error occurred: $e");
@@ -85,6 +76,10 @@ class _SigninState extends State<Signin> {
       setState(() {
         _isLoading = false; // Set loading state to true
       });
+    }finally{
+      setState(() {
+          _isLoading = false; // Set loading state to true
+        });
     }
   }
 
