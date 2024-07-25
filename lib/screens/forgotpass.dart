@@ -30,7 +30,7 @@ class _ForgotPassState extends State<ForgotPass> {
     final dio = Dio();
     try {
       final response = await dio.post(
-        "$APIURL/forget",
+        "$APIURL/forgot-password",
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
@@ -49,7 +49,7 @@ class _ForgotPassState extends State<ForgotPass> {
 
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ResetPass()),
+          MaterialPageRoute(builder: (context) => const OptVerification()),
         );
         const resMsg = 'Verification Code Sent to Email';
         ToastMsg.showSuccessToast("$resMsg");
@@ -150,15 +150,9 @@ class _ForgotPassState extends State<ForgotPass> {
                             minimumSize: const Size(double.infinity, 50),
                           ),
                           onPressed: () async {
-                            // if (_formKey.currentState!.validate()) {
-                            //   await save();
-                            // }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const OptVerification()),
-                            );
+                            if (_formKey.currentState!.validate()) {
+                              await save();
+                            }
                           },
                           child: Text(
                             'Verify',

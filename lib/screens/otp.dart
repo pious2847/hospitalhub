@@ -34,7 +34,7 @@ class _OptVerificationState extends State<OptVerification> {
 
     try {
       final response = await dio.post(
-        "$APIURL/verify",
+        "$APIURL//verify-otp",
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
@@ -42,7 +42,7 @@ class _OptVerificationState extends State<OptVerification> {
         ),
         data: {
           'email': userMail,
-          'optcode': user.otp,
+          'verificationCode': user.otp,
         },
       );
       print('Response: $response');
@@ -148,14 +148,10 @@ class _OptVerificationState extends State<OptVerification> {
                             minimumSize: const Size(double.infinity, 50),
                           ),
                           onPressed: () async {
-                            // if (_formKey.currentState!.validate()) {
-                            //   await save();
-                            // }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ResetPass()),
-                            );
+                            if (_formKey.currentState!.validate()) {
+                              await save();
+                            }
+                            
                           },
                           child: Text(
                             'Verify',

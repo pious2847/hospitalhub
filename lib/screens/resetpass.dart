@@ -5,6 +5,7 @@ import 'package:file_sharing_app/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../.env.dart';
 import '../model/user_model.dart';
@@ -29,17 +30,20 @@ class _ResetPassState extends State<ResetPass> {
       _isLoading = true; // Set loading state to true
     });
     final dio = Dio();
+    final prefs = await SharedPreferences.getInstance();
+
+       final userMail = prefs.getString('email');
     try {
       final response = await dio.post(
-        "$APIURL/reset",
+        "$APIURL/reset-password",
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
           },
         ),
         data: {
-          'newpass': user.password,
-          'confirm': user.password,
+          'email': userMail,
+          'newPassword': user.password,
         },
       );
       print('Response: $response');

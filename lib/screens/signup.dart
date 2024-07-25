@@ -45,7 +45,7 @@ class _SignupState extends State<Signup> {
           },
         ),
         data: {
-          'name': user.username,
+          'fullname': user.username,
           'cardnumber': user.cardnumber,
           'email': user.email,
           'password': user.password,
