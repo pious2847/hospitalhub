@@ -32,7 +32,7 @@ class _ResetPassState extends State<ResetPass> {
     final dio = Dio();
     final prefs = await SharedPreferences.getInstance();
 
-       final userMail = prefs.getString('email');
+    final userMail = prefs.getString('email');
     try {
       final response = await dio.post(
         "$APIURL/reset-password",
@@ -87,9 +87,7 @@ class _ResetPassState extends State<ResetPass> {
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("")
-        ),
+        appBar: AppBar(title: Text("")),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -152,8 +150,7 @@ class _ResetPassState extends State<ResetPass> {
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
-                          controller:
-                              TextEditingController(text: ''),
+                          controller: TextEditingController(text: ''),
                           obscureText: _obscureText,
                           decoration: InputDecoration(
                             labelText: 'Confirm Password',
