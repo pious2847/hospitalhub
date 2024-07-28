@@ -62,7 +62,8 @@ class _SigninState extends State<Signin> {
         );
         const resMsg = 'Welcome Back !!!';
         ToastMsg.showSuccessToast(" $resMsg,");
-      } else  {
+      } 
+      if (response.statusCode == 400)  {
         print("Invalid response ${response.statusCode}: ${response.data}");
         ToastMsg.showErrorToast("${response.data['message']}");
       }

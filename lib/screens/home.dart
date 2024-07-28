@@ -1,33 +1,54 @@
-// ignore_for_file: sort_child_properties_last
-
 import 'package:flutter/material.dart';
 import '../service/general.dart';
+import 'package:dio/dio.dart';
+import '../.env.dart';
+import '../widgets/messages.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> user = {};
- 
-  Future<Map<String, dynamic>> getUsers() async {
-    var currentUser = await getUser();
-    return currentUser ?? {}; // Return an empty map if null
-  }
+  List<Map<String, String>> patients = [];
 
   @override
   void initState() {
     super.initState();
     _loadUser();
+    _loadPatients();
   }
 
   Future<void> _loadUser() async {
-    var loadedUser = await getUsers();
+    var loadedUser = await getUser();
     setState(() {
-      user = loadedUser;
+      user = loadedUser ?? {};
     });
-    print('User $user');
+  }
+
+  Future<void> _loadPatients() async {
+    final dio = Dio();
+    final userData = await getUserDataFromLocalStorage();
+    final userId = userData['userId'] ?? '';
+    try {
+      final response = await dio.get(
+        "$APIURL/doctors/$userId/patients",
+      );
+        print("Patients Reponse1: ${response.data}");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          patients = response.data;
+        });
+        print("Patients Reponse: ${response.data}");
+      } else {
+        ToastMsg.showErrorToast("${response.data['message']}");
+      }
+    } catch (e) {}
+    ToastMsg.showErrorToast("Please Check your internet connection");
   }
 
   @override
@@ -36,14 +57,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('HealthTrack'),
         backgroundColor: Colors.teal,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Handle notifications
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -53,31 +66,17 @@ class _HomePageState extends State<HomePage> {
             children: [
               _buildWelcomeSection(),
               const SizedBox(height: 20),
-              _buildQuickActionsSection(),
-              const SizedBox(height: 20),
-              _buildPatientOverviewSection(),
-              const SizedBox(height: 20),
-              _buildRecentActivitiesSection(),
+              _buildPatientList(),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.teal,
-        onPressed: () {
-          // Handle adding new patient
-        },
-      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.people), label: 'Patients'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: 'Appointments'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Patients'),
+          BottomNavigationBarItem(icon: Icon(Icons.share), label: 'Refer'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         selectedItemColor: Colors.teal,
         unselectedItemColor: Colors.grey,
@@ -87,70 +86,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildWelcomeSection() {
-    return const Card(
-      elevation: 4,
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: AssetImage('assets/images/userdefaultpic.jpg'),
-              radius: 30,
-            ),
-            SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Welcome, Dr. John Doe', 
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text('You have 5 appointments today'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildActionButton(Icons.add, 'New Patient'),
-            _buildActionButton(Icons.calendar_today, 'Schedule'),
-            _buildActionButton(Icons.search, 'Search'),
-            _buildActionButton(Icons.bar_chart, 'Reports'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton(IconData icon, String label) {
-    return Column(
-      children: [
-        CircleAvatar(
-          backgroundColor: Colors.teal,
-          child: Icon(icon, color: Colors.white),
-          radius: 25,
-        ),
-        const SizedBox(height: 5),
-        Text(label, style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-
-  Widget _buildPatientOverviewSection() {
     return Card(
       elevation: 4,
       child: Padding(
@@ -158,18 +93,14 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Patient Overview',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              'Welcome, Dr. ${user['fullName'] ?? 'Doctor'}',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem('Total', '1,234'),
-                _buildStatItem('In Treatment', '789'),
-                _buildStatItem('Recovered', '445'),
-              ],
+            const SizedBox(height: 8),
+            Text(
+              'You have ${patients.length} patients',
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),
@@ -177,43 +108,33 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(value,
-            style: const TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal)),
-        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-      ],
-    );
-  }
-
-  Widget _buildRecentActivitiesSection() {
+  Widget _buildPatientList() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Recent Activities',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          'Your Patients',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        _buildActivityItem('John Doe', 'Admitted', '2 hours ago'),
-        _buildActivityItem('Jane Smith', 'Discharged', '4 hours ago'),
-        _buildActivityItem(
-            'Mike Johnson', 'Lab Results Updated', '6 hours ago'),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: patients.length,
+          itemBuilder: (context, index) {
+            return Card(
+              child: ListTile(
+                title: Text(patients[index]['name'] ?? ''),
+                subtitle: Text(patients[index]['diagnosis'] ?? ''),
+                leading: CircleAvatar(
+                  child: Text(patients[index]['name']?[0] ?? ''),
+                  backgroundColor: Colors.teal.shade200,
+                ),
+              ),
+            );
+          },
+        ),
       ],
-    );
-  }
-
-  Widget _buildActivityItem(String name, String action, String time) {
-    return ListTile(
-      leading: CircleAvatar(
-        child: Text(name[0]),
-        backgroundColor: Colors.teal.shade200,
-      ),
-      title: Text(name),
-      subtitle: Text(action),
-      trailing: Text(time, style: const TextStyle(color: Colors.grey)),
     );
   }
 }
