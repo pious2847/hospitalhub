@@ -2,9 +2,11 @@
 
 class User {
   String username;
+  String cardnumber;
   String email;
+  String otp;
   String password;
-  User(this.username, this.email, this.password);
+  User(this.username, this.cardnumber,this.email, this.password, this.otp);
 }
 
 class Patient {
@@ -33,7 +35,6 @@ class Patient {
   // Add this method
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'dateOfBirth': dateOfBirth,
       'phone': phone,

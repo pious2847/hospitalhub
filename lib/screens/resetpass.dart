@@ -1,28 +1,28 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:dio/dio.dart';
+import 'package:hospitalhub/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../.env.dart';
 import '../model/user_model.dart';
 import '../widgets/colors.dart';
 import '../widgets/messages.dart';
-import 'login.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class ResetPass extends StatefulWidget {
+  const ResetPass({super.key});
 
   @override
-  _SignupState createState() => _SignupState();
+  _ResetPassState createState() => _ResetPassState();
 }
 
-class _SignupState extends State<Signup> {
+class _ResetPassState extends State<ResetPass> {
   final _formKey = GlobalKey<FormState>();
   bool isRegisted = false;
   bool _obscureText = true;
-  
   bool _isLoading = false; // Add this line
 
   Future<void> save() async {
@@ -30,50 +30,45 @@ class _SignupState extends State<Signup> {
       _isLoading = true; // Set loading state to true
     });
     final dio = Dio();
-    print(
-      "email" + user.email,
-    );
-    print(
-      'Password' + user.password,
-    );
+    final prefs = await SharedPreferences.getInstance();
+
+    final userMail = prefs.getString('email');
     try {
       final response = await dio.post(
-        "$APIURL/register",
+        "$APIURL/reset-password",
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
           },
         ),
         data: {
-          'fullName': user.username,
-          'cardnumber': user.cardnumber,
-          'email': user.email,
-          'password': user.password,
+          'email': userMail,
+          'newPassword': user.password,
         },
       );
-       print('Response: $response');
+      print('Response: $response');
 
       if (response.statusCode == 200) {
-        // print('Userid ' + response.data);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Signin()),
         );
-        const resMsg = 'Accrount Created Sucessfully !!';
+        const resMsg = 'Password reset sucessfully !!';
         ToastMsg.showSuccessToast(" $resMsg,");
+
+        // Dismiss the loading dialog after successful login
       } else {
         print("Invalid response ${response.statusCode}: ${response.data}");
-      ToastMsg.showErrorToast("Login Failed Please try again");
+        ToastMsg.showErrorToast("Password reset Failed Please try again");
         setState(() {
           _isLoading = false; // Set loading state to true
         });
       }
     } catch (e) {
       print("Error occurred: $e");
-      ToastMsg.showErrorToast("Login Failed Please try again");
-      // Handle error, show toast or snackba
-    }finally{
-       setState(() {
+      ToastMsg.showErrorToast("Password reset Failed Please try again");
+      // Handle error, show toast or snackbar
+      setState(() {
         _isLoading = false; // Set loading state to true
       });
     }
@@ -92,6 +87,7 @@ class _SignupState extends State<Signup> {
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: Scaffold(
+        appBar: AppBar(title: Text("")),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -101,7 +97,7 @@ class _SignupState extends State<Signup> {
                 children: [
                   const SizedBox(height: 80),
                   Text(
-                    "Welcome Back",
+                    "Reset Password",
                     style: GoogleFonts.poppins(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -109,7 +105,7 @@ class _SignupState extends State<Signup> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Sign in to continue",
+                    "complete to continue",
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                     ),
@@ -120,71 +116,6 @@ class _SignupState extends State<Signup> {
                     child: Column(
                       children: [
                         TextFormField(
-                          controller: TextEditingController(text: user.username),
-                          onChanged: (value) {
-                            user.username = value;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Fullname',
-                            prefixIcon: const Icon(Iconsax.user_octagon_copy),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your fullname';
-                            } 
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                          TextFormField(
-                          controller: TextEditingController(text: user.cardnumber),
-                          onChanged: (value) {
-                            user.cardnumber = value;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'ID Number',
-                            prefixIcon: const Icon(Iconsax.card_copy),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your ID';
-                            } 
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: TextEditingController(text: user.email),
-                          onChanged: (value) {
-                            user.email = value;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: const Icon(Iconsax.message_2_copy),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter your email';
-                            } else if (!RegExp(
-                                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(value)) {
-                              return 'Enter a valid email address';
-                            }
-                            return null;
-                          },
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        TextFormField(
                           controller:
                               TextEditingController(text: user.password),
                           onChanged: (value) {
@@ -193,6 +124,36 @@ class _SignupState extends State<Signup> {
                           obscureText: _obscureText,
                           decoration: InputDecoration(
                             labelText: 'Password',
+                            prefixIcon: const Icon(Iconsax.lock_1_copy),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureText
+                                    ? Iconsax.eye_copy
+                                    : Iconsax.eye_slash_copy,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: TextEditingController(text: ''),
+                          obscureText: _obscureText,
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
                             prefixIcon: const Icon(Iconsax.lock_1_copy),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -234,40 +195,12 @@ class _SignupState extends State<Signup> {
                             }
                           },
                           child: Text(
-                            'Sign Up',
+                            'Submit',
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
-                          ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            elevation:0.0,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: primcolorlight, width: 1.0),
-                            ),
-                            minimumSize: const Size(double.infinity, 50),
-                          ),
-                          onPressed: () async {
-                            Navigator.pushReplacement(
-                              // ignore: use_build_context_synchronously
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const Signin(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Sign in',
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                        
                       ],
                     ),
                   ),

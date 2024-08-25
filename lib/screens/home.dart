@@ -54,12 +54,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = false;
       });
-      ToastMsg.showToastMsg(
-        context,
-          'Error fetching patients check internet connection',
-        Color.fromARGB(255, 255, 37, 37),
-      );
-      // You might want to show an error message to the user here
+      ToastMsg.showErrorToast("Error fetching patients check internet connection");
     }
   }
 
@@ -67,26 +62,26 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Patient Management'),
+        title: const Text('Patient Management'),
         centerTitle: true,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: fetchPatients,
               child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.all(16),
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PatientCountCard(patientCount: patients.length),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     Text(
                       'Patient List',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     PatientTable(patients: patients),
                   ],
                 ),
@@ -97,11 +92,11 @@ class _HomePageState extends State<HomePage> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return PatientModal();
+              return const PatientModal();
             },
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
@@ -135,7 +130,7 @@ class PatientCountCard extends StatelessWidget {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -143,7 +138,7 @@ class PatientCountCard extends StatelessWidget {
               'Total Patients',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               '$patientCount',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -165,20 +160,23 @@ class PatientTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Status')),
-          ],
-          rows: patients.map((patient) => DataRow(cells: [
-            DataCell(Text(patient.name)),
-            DataCell(Text(patient.status)),
-          ])).toList(),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: const [
+              DataColumn(label: Text('Name')),
+              DataColumn(label: Text('Status')),
+            ],
+            rows: patients.map((patient) => DataRow(cells: [
+              DataCell(Text(patient.name)),
+              DataCell(Text(patient.status)),
+            ])).toList(),
+          ),
         ),
       ),
     );

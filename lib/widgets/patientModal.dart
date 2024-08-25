@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/model/user_model.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -75,8 +76,12 @@ class _PatientModalState extends State<PatientModal> {
       final dio = Dio();
       try {
         if (widget.patient == null) {
+          final prefs = await SharedPreferences.getInstance();
+          final doctorId = prefs.getString('userId');
+
+          print(patient.toJson());
           // Adding new patient
-          await dio.post('$APIURL/patients', data: patient.toJson());
+          await dio.post('$APIURL/patients/$doctorId', data: patient.toJson());
           print("Patient added: $patient");
         } else {
           // Updating existing patient
@@ -210,8 +215,11 @@ class _PatientModalState extends State<PatientModal> {
         ),
       ),
       actions: [
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.14,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+                    SizedBox(
+          width: MediaQuery.of(context).size.width * 0.3,
           child: ElevatedButton(
             onPressed: _savePatient,
             child: Text(widget.patient == null ? 'Save' : 'Update'),
@@ -219,12 +227,16 @@ class _PatientModalState extends State<PatientModal> {
         ),
         const SizedBox(width: 14.0),
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.14,
+          width: MediaQuery.of(context).size.width * 0.3,
           child: TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
         ),
+      
+          ],
+        )
+
       ],
     );
   }

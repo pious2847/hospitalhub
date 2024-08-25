@@ -1,16 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:hospitalhub/screens/forgotpass.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hospitalhub/.env.dart';
-import 'package:hospitalhub/model/user_model.dart';
-import 'package:hospitalhub/screens/home.dart';
-import 'package:hospitalhub/service/general.dart';
-import 'package:hospitalhub/widgets/colors.dart';
-import 'package:hospitalhub/widgets/messages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-
+import '../.env.dart';
+import '../service/general.dart';
+import '../model/user_model.dart';
+import '../widgets/colors.dart';
+import '../widgets/messages.dart';
+import 'home.dart';
+import 'signup.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -23,8 +24,6 @@ class _SigninState extends State<Signin> {
   final _formKey = GlobalKey<FormState>();
   bool isRegisted = false;
   bool _obscureText = true;
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
   bool _isLoading = false; // Add this line
 
   Future<void> save() async {
@@ -32,8 +31,6 @@ class _SigninState extends State<Signin> {
       _isLoading = true; // Set loading state to true
     });
     final dio = Dio();
-    print( "email" + user.email,);
-    print('Password'+ user.password,);
     try {
       final response = await dio.post(
         "$APIURL/login",
@@ -47,55 +44,46 @@ class _SigninState extends State<Signin> {
           'password': user.password,
         },
       );
+
       print('Response: $response');
 
       if (response.statusCode == 200) {
-        // print('Userid ' + response.data);
-
         final prefs = await SharedPreferences.getInstance();
-       
-        await saveUserDataToLocalStorage(response.data['userId']);
+        final userId = await response.data['doctor']['_id'];
+        await saveUserDataToLocalStorage(userId);
 
         prefs.setBool('showHome', true);
+        prefs.setString('jwt_token', '${response.data['token']}');
+        print("User Token ${response.data['token']}");
 
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>  HomePage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
         );
-        final resMsg = 'Welcome Back !!!';
-        ToastMsg.showToastMsg(
-          context,
-          resMsg,
-          const Color.fromARGB(255, 76, 175, 80),
-        );
-        // Dismiss the loading dialog after successful login
-      } else {
+        const resMsg = 'Welcome Back !!!';
+        ToastMsg.showSuccessToast(" $resMsg,");
+      } 
+      if (response.statusCode == 400)  {
         print("Invalid response ${response.statusCode}: ${response.data}");
-        ToastMsg.showToastMsg(
-          context,
-          'Login Failed Please try again',
-          Color.fromARGB(255, 255, 37, 37),
-        );
-        setState(() {
-          _isLoading = false; // Set loading state to true
-        });
+        ToastMsg.showErrorToast("${response.data['message']}");
       }
     } catch (e) {
       print("Error occurred: $e");
-
-      ToastMsg.showToastMsg(
-        context,
-          'Login Failed Please try again',
-        Color.fromARGB(255, 255, 37, 37),
-      );
+      ToastMsg.showErrorToast("Login Failed Please try again");
       // Handle error, show toast or snackbar
       setState(() {
         _isLoading = false; // Set loading state to true
       });
+    }finally{
+      setState(() {
+          _isLoading = false; // Set loading state to true
+        });
     }
   }
 
   User user = User(
+    '',
+    '',
     '',
     '',
     '',
@@ -135,12 +123,12 @@ class _SigninState extends State<Signin> {
                       children: [
                         TextFormField(
                           controller: TextEditingController(text: user.email),
-                        onChanged: (value) {
-                          user.email = value;
-                        },
+                          onChanged: (value) {
+                            user.email = value;
+                          },
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: Icon(Iconsax.message_2_copy),
+                            prefixIcon: const Icon(Iconsax.message_2_copy),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -156,17 +144,17 @@ class _SigninState extends State<Signin> {
                             return null;
                           },
                         ),
-                        
                         const SizedBox(height: 16),
                         TextFormField(
-                          controller: TextEditingController(text: user.password),
-                        onChanged: (value) {
-                          user.password = value;
-                        },
+                          controller:
+                              TextEditingController(text: user.password),
+                          onChanged: (value) {
+                            user.password = value;
+                          },
                           obscureText: _obscureText,
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            prefixIcon: Icon(Iconsax.lock_1_copy),
+                            prefixIcon: const Icon(Iconsax.lock_1_copy),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureText
@@ -190,14 +178,12 @@ class _SigninState extends State<Signin> {
                             return null;
                           },
                         ),
-                        
                         const SizedBox(height: 24),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             foregroundColor: secondarytextcolor,
                             backgroundColor: primcolorlight,
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -211,11 +197,38 @@ class _SigninState extends State<Signin> {
                           child: Text(
                             'Sign In',
                             style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
                             ),
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation:0.0,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(color: primcolorlight, width: 1.0),
+                            ),
+                            minimumSize: const Size(double.infinity, 50),
+                          ),
+                          onPressed: () async {
+                            Navigator.pushReplacement(
+                              // ignore: use_build_context_synchronously
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Signup(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Sign Up',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      
                       ],
                     ),
                   ),
@@ -223,7 +236,13 @@ class _SigninState extends State<Signin> {
                   Center(
                     child: TextButton(
                       onPressed: () {
-                        // Navigate to forgot password screen
+                         Navigator.push(
+                              // ignore: use_build_context_synchronously
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ForgotPass(),
+                              ),
+                            );
                       },
                       child: Text(
                         'Forgot Password?',
@@ -234,9 +253,7 @@ class _SigninState extends State<Signin> {
                     ),
                   ),
                   const SizedBox(height: 48),
-                
                 ],
-              
               ),
             ),
           ),

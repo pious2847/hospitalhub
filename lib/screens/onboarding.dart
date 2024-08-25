@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hospitalhub/model/onboarding.model.dart';
-import 'package:hospitalhub/screens/login.dart';
-import 'package:hospitalhub/widgets/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../model/onboarding.model.dart';
+import '../widgets/colors.dart';
+import 'login.dart';
 
 
 class Onbording extends StatefulWidget {
