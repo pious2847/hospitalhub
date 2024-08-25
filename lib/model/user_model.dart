@@ -7,3 +7,56 @@ class User {
   User(this.username, this.email, this.password);
 }
 
+class Patient {
+  String? id;  // Add this line
+  String name;
+  String dateOfBirth;
+  String phone;
+  String email;
+  String diagnosis;
+  String address;
+  String expenses;
+  String status;
+
+  Patient({
+    this.id,  // Add this line
+    required this.name,
+    required this.dateOfBirth,
+    required this.phone,
+    required this.email,
+    required this.diagnosis,
+    required this.address,
+    required this.expenses,
+    required this.status,
+  });
+
+  // Add this method
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'dateOfBirth': dateOfBirth,
+      'phone': phone,
+      'email': email,
+      'diagnosis': diagnosis,
+      'address': address,
+      'expenses': expenses,
+      'status': status,
+    };
+  }
+
+  // Optionally, add this factory constructor
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    return Patient(
+      id: json['_id'],
+      name: json['name'],
+      dateOfBirth: json['dateOfBirth'],
+      phone: json['phone'],
+      email: json['email'],
+      diagnosis: json['diagnosis'],
+      address: json['address'],
+      expenses: json['expenses'],
+      status: json['status'],
+    );
+  }
+}
