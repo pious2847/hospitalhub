@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:hospitalhub/screens/otp.dart';
-import 'package:hospitalhub/screens/resetpass.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';

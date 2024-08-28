@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'package:hospitalhub/screens/home.dart';
 import 'package:hospitalhub/screens/onboarding.dart';
 
 void main() {
