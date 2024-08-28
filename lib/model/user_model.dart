@@ -35,6 +35,7 @@ class Patient {
   // Add this method
   Map<String, dynamic> toJson() {
     return {
+      "id": id,
       'name': name,
       'dateOfBirth': dateOfBirth,
       'phone': phone,
