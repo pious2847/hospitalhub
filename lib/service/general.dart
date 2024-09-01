@@ -11,7 +11,7 @@ Future<Map<String, dynamic>> getUserDataFromLocalStorage() async {
   final prefs = await SharedPreferences.getInstance();
   final userId = prefs.getString('userId');
   final isLoggedIn = prefs.getBool('isLoggedIn') ??
-      false; // Default value is false if not found
+      false; 
   return {'userId': userId, 'isLoggedIn': isLoggedIn};
 }
 
