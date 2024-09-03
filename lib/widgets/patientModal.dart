@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/model/user_model.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:hospitalhub/widgets/colors.dart';
+import 'package:intl/intl.dart';
 
 class PatientModal extends StatefulWidget {
   final Patient? patient;
@@ -30,12 +32,16 @@ class _PatientModalState extends State<PatientModal> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.patient?.name ?? '');
-    _dobController = TextEditingController(text: widget.patient?.dateOfBirth ?? '');
+    _dobController = TextEditingController(
+      text: widget.patient?.formattedDateOfBirth ?? '',
+    );
     _phoneController = TextEditingController(text: widget.patient?.phone ?? '');
     _emailController = TextEditingController(text: widget.patient?.email ?? '');
     _diagnosisController = TextEditingController(text: widget.patient?.diagnosis ?? '');
     _addressController = TextEditingController(text: widget.patient?.address ?? '');
-    _expensesController = TextEditingController(text: widget.patient?.expenses ?? '');
+    _expensesController = TextEditingController(
+      text: widget.patient?.formattedExpenses ?? '',
+    );
     _statusController = TextEditingController(text: widget.patient?.status ?? '');
   }
 
@@ -57,12 +63,12 @@ class _PatientModalState extends State<PatientModal> {
       final patient = Patient(
         id: widget.patient?.id,
         name: _nameController.text,
-        dateOfBirth: _dobController.text,
+        dateOfBirth: DateFormat('yyyy-MM-dd').parse(_dobController.text),
         phone: _phoneController.text,
         email: _emailController.text,
         diagnosis: _diagnosisController.text,
         address: _addressController.text,
-        expenses: _expensesController.text,
+        expenses: num.parse(_expensesController.text),
         status: _statusController.text,
       );
 
@@ -91,6 +97,9 @@ class _PatientModalState extends State<PatientModal> {
     required IconData icon,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    VoidCallback? onTap,
+    bool readOnly = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -107,8 +116,25 @@ class _PatientModalState extends State<PatientModal> {
         ),
         validator: validator ?? (value) => value?.isEmpty ?? true ? 'This field is required' : null,
         keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
+        onTap: onTap,
+        readOnly: readOnly,
       ),
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: widget.patient?.dateOfBirth ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _dobController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
   }
 
   @override
@@ -143,6 +169,8 @@ class _PatientModalState extends State<PatientModal> {
                   controller: _dobController,
                   label: 'Date of Birth',
                   icon: Iconsax.calendar,
+                  readOnly: true,
+                  onTap: () => _selectDate(context),
                 ),
                 _buildTextField(
                   controller: _phoneController,
@@ -170,7 +198,10 @@ class _PatientModalState extends State<PatientModal> {
                   controller: _expensesController,
                   label: 'Expenses',
                   icon: Iconsax.money,
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                  ],
                 ),
                 _buildTextField(
                   controller: _statusController,

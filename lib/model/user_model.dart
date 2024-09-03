@@ -10,18 +10,18 @@ class User {
 }
 
 class Patient {
-  String? id;  // Add this line
+  String? id;
   String name;
-  String dateOfBirth;
+  DateTime dateOfBirth;
   String phone;
   String email;
   String diagnosis;
   String address;
-  String expenses;
+  num expenses;
   String status;
 
   Patient({
-    this.id,  // Add this line
+    this.id,
     required this.name,
     required this.dateOfBirth,
     required this.phone,
@@ -32,12 +32,11 @@ class Patient {
     required this.status,
   });
 
-  // Add this method
   Map<String, dynamic> toJson() {
     return {
       "id": id,
       'name': name,
-      'dateOfBirth': dateOfBirth,
+      'dateOfBirth': dateOfBirth.toIso8601String(),
       'phone': phone,
       'email': email,
       'diagnosis': diagnosis,
@@ -47,12 +46,11 @@ class Patient {
     };
   }
 
-  // Optionally, add this factory constructor
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
       id: json['_id'],
       name: json['name'],
-      dateOfBirth: json['dateOfBirth'],
+      dateOfBirth: DateTime.parse(json['dateOfBirth']),
       phone: json['phone'],
       email: json['email'],
       diagnosis: json['diagnosis'],
@@ -61,4 +59,12 @@ class Patient {
       status: json['status'],
     );
   }
+
+  String get formattedDateOfBirth {
+    return "${dateOfBirth.year}-${dateOfBirth.month.toString().padLeft(2, '0')}-${dateOfBirth.day.toString().padLeft(2, '0')}";
+  }
+
+  String get formattedExpenses {
+    return expenses.toStringAsFixed(2);
+  } 
 }

@@ -18,12 +18,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Patient> patients = [];
   bool isLoading = true;
-  final Dio _dio = Dio();
+  final _dio = Dio();
 
   @override
   void initState() {
     super.initState();
     fetchPatients();
+  }
+
+  List<Patient> parsePatients(Map<String, dynamic> responseData) {
+    List<dynamic> patientsJson = responseData['patients'];
+    return patientsJson.map((json) => Patient.fromJson(json)).toList();
   }
 
   Future<void> fetchPatients() async {
@@ -40,11 +45,11 @@ class _HomePageState extends State<HomePage> {
       }
 
       final response = await _dio.get('$APIURL/doctors/$doctorId/patients');
+      print(response);
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+        final Map<String, dynamic> data = response.data;
         setState(() {
-          patients = data.map((json) => Patient.fromJson(json)).toList();
-          isLoading = false;
+          patients = parsePatients(data);
         });
       } else {
         throw Exception('Failed to load patients');
@@ -69,10 +74,10 @@ class _HomePageState extends State<HomePage> {
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text('Patient Management',
+              title: const Text('Patient Management',
                   style: TextStyle(color: secondarytextcolor)),
               background: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -103,7 +108,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           isLoading
-              ? SliverFillRemaining(
+              ? const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
                 )
               : SliverList(
@@ -125,8 +130,8 @@ class _HomePageState extends State<HomePage> {
             },
           );
         },
-        icon: Icon(Icons.add, color: secondarytextcolor),
-        label: Text('Add Patient', style: TextStyle(color: secondarytextcolor)),
+        icon: const Icon(Icons.add, color: secondarytextcolor),
+        label: const Text('Add Patient', style: TextStyle(color: secondarytextcolor)),
         backgroundColor: primcolorlight,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -171,8 +176,8 @@ class PatientCountCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Iconsax.user_tick, size: 48, color: primcolor),
-            SizedBox(width: 16),
+            const Icon(Iconsax.user_tick, size: 48, color: primcolor),
+            const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -180,7 +185,7 @@ class PatientCountCard extends StatelessWidget {
                   'Total Patients',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   '$patientCount',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -205,18 +210,18 @@ class PatientListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: primcolorlight,
           child: Text(
             patient.name[0].toUpperCase(),
-            style: TextStyle(color: secondarytextcolor),
+            style: const TextStyle(color: secondarytextcolor),
           ),
         ),
         title: Text(patient.name),
         subtitle: Text(patient.status),
-        trailing: Icon(Iconsax.arrow_right_3, color: primcolor),
+        trailing: const Icon(Iconsax.arrow_right_3, color: primcolor),
         onTap: () {
           // Navigate to patient details page
         },
