@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/model/user_model.dart';
+import 'package:hospitalhub/widgets/colors.dart';
 import 'package:hospitalhub/widgets/messages.dart';
 import 'package:hospitalhub/widgets/patientModal.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -39,7 +40,6 @@ class _HomePageState extends State<HomePage> {
       }
 
       final response = await _dio.get('$APIURL/doctors/$doctorId/patients');
-      print(response);
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         setState(() {
@@ -55,40 +55,68 @@ class _HomePageState extends State<HomePage> {
         isLoading = false;
       });
       ToastMsg.showErrorToast(
-          "Error fetching patients check internet connection");
+          "Error fetching patients. Please check your internet connection.");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Patient Management'),
-        centerTitle: true,
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: fetchPatients,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    PatientCountCard(patientCount: patients.length),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Patient List',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 16),
-                    PatientTable(patients: patients),
-                  ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 200.0,
+            floating: false,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('Patient Management',
+                  style: TextStyle(color: secondarytextcolor)),
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [primcolor, primcolorlight],
+                  ),
                 ),
               ),
             ),
-      floatingActionButton: FloatingActionButton(
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PatientCountCard(patientCount: patients.length),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Patient List',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: primcolor,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+          isLoading
+              ? SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return PatientListItem(patient: patients[index]);
+                    },
+                    childCount: patients.length,
+                  ),
+                ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           showDialog(
             context: context,
@@ -97,10 +125,14 @@ class _HomePageState extends State<HomePage> {
             },
           );
         },
-        child: const Icon(Icons.add),
+        icon: Icon(Icons.add, color: secondarytextcolor),
+        label: Text('Add Patient', style: TextStyle(color: secondarytextcolor)),
+        backgroundColor: primcolorlight,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
+        selectedItemColor: primcolor,
+        unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Iconsax.home),
@@ -113,6 +145,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Iconsax.share),
             label: 'Refers',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Iconsax.user_octagon),
+            label: 'Profile',
           ),
         ],
       ),
@@ -133,20 +169,26 @@ class PatientCountCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(
-              'Total Patients',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$patientCount',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
-                  ),
+            Icon(Iconsax.user_tick, size: 48, color: primcolor),
+            SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Patients',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  '$patientCount',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: primcolor,
+                      ),
+                ),
+              ],
             ),
           ],
         ),
@@ -155,33 +197,29 @@ class PatientCountCard extends StatelessWidget {
   }
 }
 
-class PatientTable extends StatelessWidget {
-  final List<Patient> patients;
+class PatientListItem extends StatelessWidget {
+  final Patient patient;
 
-  const PatientTable({Key? key, required this.patients}) : super(key: key);
+  const PatientListItem({Key? key, required this.patient}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: const [
-              DataColumn(label: Text('Name')),
-              DataColumn(label: Text('Status')),
-            ],
-            rows: patients
-                .map((patient) => DataRow(cells: [
-                      DataCell(Text(patient.name)),
-                      DataCell(Text(patient.status)),
-                    ]))
-                .toList(),
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: primcolorlight,
+          child: Text(
+            patient.name[0].toUpperCase(),
+            style: TextStyle(color: secondarytextcolor),
           ),
         ),
+        title: Text(patient.name),
+        subtitle: Text(patient.status),
+        trailing: Icon(Iconsax.arrow_right_3, color: primcolor),
+        onTap: () {
+          // Navigate to patient details page
+        },
       ),
     );
   }

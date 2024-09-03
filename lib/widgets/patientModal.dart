@@ -4,14 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/model/user_model.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:hospitalhub/widgets/colors.dart';
 
 class PatientModal extends StatefulWidget {
   final Patient? patient;
 
-  const PatientModal({
-    Key? key,
-    this.patient,
-  }) : super(key: key);
+  const PatientModal({Key? key, this.patient}) : super(key: key);
 
   @override
   _PatientModalState createState() => _PatientModalState();
@@ -32,18 +30,13 @@ class _PatientModalState extends State<PatientModal> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.patient?.name ?? '');
-    _dobController =
-        TextEditingController(text: widget.patient?.dateOfBirth ?? '');
+    _dobController = TextEditingController(text: widget.patient?.dateOfBirth ?? '');
     _phoneController = TextEditingController(text: widget.patient?.phone ?? '');
     _emailController = TextEditingController(text: widget.patient?.email ?? '');
-    _diagnosisController =
-        TextEditingController(text: widget.patient?.diagnosis ?? '');
-    _addressController =
-        TextEditingController(text: widget.patient?.address ?? '');
-    _expensesController =
-        TextEditingController(text: widget.patient?.expenses ?? '');
-    _statusController =
-        TextEditingController(text: widget.patient?.status ?? '');
+    _diagnosisController = TextEditingController(text: widget.patient?.diagnosis ?? '');
+    _addressController = TextEditingController(text: widget.patient?.address ?? '');
+    _expensesController = TextEditingController(text: widget.patient?.expenses ?? '');
+    _statusController = TextEditingController(text: widget.patient?.status ?? '');
   }
 
   @override
@@ -78,166 +71,149 @@ class _PatientModalState extends State<PatientModal> {
         if (widget.patient == null) {
           final prefs = await SharedPreferences.getInstance();
           final doctorId = prefs.getString('userId');
-
-          print(patient.toJson());
-          // Adding new patient
           await dio.post('$APIURL/patients/$doctorId', data: patient.toJson());
-          print("Patient added: $patient");
         } else {
-          // Updating existing patient
-          await dio.put('$APIURL/patients/${widget.patient!.id}',
-              data: patient.toJson());
-          print("Patient updated: $patient");
+          await dio.put('$APIURL/patients/${widget.patient!.id}', data: patient.toJson());
         }
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true); // Return true to indicate success
       } catch (e) {
         print("Error saving patient: $e");
-        // Show error message to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving patient. Please try again.')),
+        );
       }
     }
   }
 
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: primcolor),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: primcolor, width: 2),
+          ),
+        ),
+        validator: validator ?? (value) => value?.isEmpty ?? true ? 'This field is required' : null,
+        keyboardType: keyboardType,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Colors.white,
-      title: Text(widget.patient == null ? 'Add Patient' : 'Update Patient'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  prefixIcon: const Icon(Iconsax.user),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  widget.patient == null ? 'Add Patient' : 'Update Patient',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: primcolor,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter patient name' : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _dobController,
-                decoration: InputDecoration(
-                  labelText: 'Date of Birth',
-                  prefixIcon: const Icon(Iconsax.calendar),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                const SizedBox(height: 24),
+                _buildTextField(
+                  controller: _nameController,
+                  label: 'Name',
+                  icon: Iconsax.user,
                 ),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter patient DOB' : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Phone',
-                  prefixIcon: const Icon(Iconsax.call),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                _buildTextField(
+                  controller: _dobController,
+                  label: 'Date of Birth',
+                  icon: Iconsax.calendar,
                 ),
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter patient phone'
-                    : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: const Icon(Iconsax.sms),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                _buildTextField(
+                  controller: _phoneController,
+                  label: 'Phone',
+                  icon: Iconsax.call,
+                  keyboardType: TextInputType.phone,
                 ),
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter patient email'
-                    : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _diagnosisController,
-                decoration: InputDecoration(
-                  labelText: 'Diagnosis',
-                  prefixIcon: const Icon(Iconsax.health),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                _buildTextField(
+                  controller: _emailController,
+                  label: 'Email',
+                  icon: Iconsax.sms,
+                  keyboardType: TextInputType.emailAddress,
                 ),
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter patient diagnosis'
-                    : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  labelText: 'Address',
-                  prefixIcon: const Icon(Iconsax.location),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                _buildTextField(
+                  controller: _diagnosisController,
+                  label: 'Diagnosis',
+                  icon: Iconsax.health,
                 ),
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter patient address'
-                    : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _expensesController,
-                decoration: InputDecoration(
-                  labelText: 'Expenses',
-                  prefixIcon: const Icon(Iconsax.money),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                _buildTextField(
+                  controller: _addressController,
+                  label: 'Address',
+                  icon: Iconsax.location,
                 ),
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter patient expenses'
-                    : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _statusController,
-                decoration: InputDecoration(
-                  labelText: 'Status',
-                  prefixIcon: const Icon(Iconsax.status),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                _buildTextField(
+                  controller: _expensesController,
+                  label: 'Expenses',
+                  icon: Iconsax.money,
+                  keyboardType: TextInputType.number,
                 ),
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please enter patient status'
-                    : null,
-              ),
-            ],
+                _buildTextField(
+                  controller: _statusController,
+                  label: 'Status',
+                  icon: Iconsax.status,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _savePatient,
+                        child: Text(widget.patient == null ? 'Save' : 'Update'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primcolor,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancel'),
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(color: primcolor),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-                    SizedBox(
-          width: MediaQuery.of(context).size.width * 0.3,
-          child: ElevatedButton(
-            onPressed: _savePatient,
-            child: Text(widget.patient == null ? 'Save' : 'Update'),
-          ),
-        ),
-        const SizedBox(width: 14.0),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.3,
-          child: TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-        ),
-      
-          ],
-        )
-
-      ],
     );
   }
 }

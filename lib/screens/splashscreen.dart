@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
             Icon(
               Iconsax.hospital_copy,
               size: 140,
-              color: secondarytextcolor,
+              color: primcolorlight,
             ),
             SizedBox(
               height: 15,
@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
               style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 27,
-                  color: Colors.white),
+                  color: primcolorlight),
             ),
             SizedBox(
               height: 4,
@@ -81,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen>
               'Keep track & manage your patient Records ',
               style: TextStyle(
                   fontSize: 13,
-                  color: Colors.white,
+                  color: primcolorlight,
                   fontStyle: FontStyle.italic),
             ),
           ],
