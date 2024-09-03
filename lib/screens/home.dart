@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       final response = await _dio.get('$APIURL/doctors/$doctorId/patients');
-
+      print(response);
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         setState(() {
@@ -54,7 +54,8 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = false;
       });
-      ToastMsg.showErrorToast("Error fetching patients check internet connection");
+      ToastMsg.showErrorToast(
+          "Error fetching patients check internet connection");
     }
   }
 
@@ -122,7 +123,8 @@ class _HomePageState extends State<HomePage> {
 class PatientCountCard extends StatelessWidget {
   final int patientCount;
 
-  const PatientCountCard({Key? key, required this.patientCount}) : super(key: key);
+  const PatientCountCard({Key? key, required this.patientCount})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -172,10 +174,12 @@ class PatientTable extends StatelessWidget {
               DataColumn(label: Text('Name')),
               DataColumn(label: Text('Status')),
             ],
-            rows: patients.map((patient) => DataRow(cells: [
-              DataCell(Text(patient.name)),
-              DataCell(Text(patient.status)),
-            ])).toList(),
+            rows: patients
+                .map((patient) => DataRow(cells: [
+                      DataCell(Text(patient.name)),
+                      DataCell(Text(patient.status)),
+                    ]))
+                .toList(),
           ),
         ),
       ),

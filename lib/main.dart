@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hospitalhub/screens/onboarding.dart';
+import 'package:hospitalhub/screens/splashscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  const Onbording(),
+      home:  const SplashScreen(),
     );
   }
 }
