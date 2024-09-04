@@ -50,6 +50,7 @@ class _HomePageState extends State<HomePage> {
         final Map<String, dynamic> data = response.data;
         setState(() {
           patients = parsePatients(data);
+          isLoading = false;
         });
       } else {
         throw Exception('Failed to load patients');
@@ -205,7 +206,7 @@ class PatientCountCard extends StatelessWidget {
 class PatientListItem extends StatelessWidget {
   final Patient patient;
 
-  const PatientListItem({Key? key, required this.patient}) : super(key: key);
+  const PatientListItem({super.key, required this.patient});
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +222,7 @@ class PatientListItem extends StatelessWidget {
         ),
         title: Text(patient.name),
         subtitle: Text(patient.status),
-        trailing: const Icon(Iconsax.arrow_right_3, color: primcolor),
+        trailing: const Icon(Iconsax.arrow_right_3_copy, color: primcolor),
         onTap: () {
           // Navigate to patient details page
         },
