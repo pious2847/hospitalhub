@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/model/user_model.dart';
+import 'package:hospitalhub/screens/patientDetails.dart';
 import 'package:hospitalhub/widgets/colors.dart';
 import 'package:hospitalhub/widgets/messages.dart';
 import 'package:hospitalhub/widgets/patientModal.dart';
@@ -224,7 +225,10 @@ class PatientListItem extends StatelessWidget {
         subtitle: Text(patient.status),
         trailing: const Icon(Iconsax.arrow_right_3_copy, color: primcolor),
         onTap: () {
-          // Navigate to patient details page
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PatientDetails(patient: patient,)),
+        );
         },
       ),
     );
