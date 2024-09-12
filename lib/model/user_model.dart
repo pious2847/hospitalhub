@@ -4,9 +4,31 @@ class User {
   String username;
   String cardnumber;
   String email;
-  String otp;
-  String password;
-  User(this.username, this.cardnumber,this.email, this.password, this.otp);
+  String? otp;
+  String? password;
+  User({
+   required this.username, 
+   required this.cardnumber, 
+   required this.email, 
+    this.password, 
+    this.otp,
+    } );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+      'cardnumber': cardnumber,
+      'email': email,
+    };
+  }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      username: json['username'],
+      cardnumber: json['cardnumber'],
+      email: json['email'],
+    );
+  }
 }
 
 class Patient {
@@ -66,5 +88,5 @@ class Patient {
 
   String get formattedExpenses {
     return expenses.toStringAsFixed(2);
-  } 
+  }
 }

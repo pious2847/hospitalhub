@@ -72,11 +72,7 @@ class _ForgotPassState extends State<ForgotPass> {
   }
 
   User user = User(
-    '',
-    '',
-    '',
-    '',
-    '',
+     username: '', cardnumber: '', email: '', password: '', otp: '',
   );
 
   @override

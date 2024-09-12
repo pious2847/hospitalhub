@@ -75,11 +75,7 @@ class _ResetPassState extends State<ResetPass> {
   }
 
   User user = User(
-    '',
-    '',
-    '',
-    '',
-    '',
+     username: '', cardnumber: '', email: '', password: '', otp: '',
   );
 
   @override

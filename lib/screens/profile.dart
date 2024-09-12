@@ -4,48 +4,43 @@ import 'package:hospitalhub/widgets/colors.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../model/user_model.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class PatientDetails extends StatefulWidget {
-  final Patient? patient;
+class ProfilePage extends StatefulWidget {
 
-  const PatientDetails({Key? key, this.patient}) : super(key: key);
+  const ProfilePage({super.key, });
 
   @override
-  _PatientDetailsState createState() => _PatientDetailsState();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _PatientDetailsState extends State<PatientDetails> {
+class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = false;
-  Map<String, dynamic> healthInfo = {};
+  List<User> doctorInfo = [];
   final ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    fetchHealthInfo();
+    fetchdoctorInfo();
+  }
+    List<User> parseDoctor(Map<String, dynamic> responseData) {
+    List<dynamic> doctorJson = responseData['doctor'];
+    return doctorJson.map((json) => User.fromJson(json)).toList();
   }
 
-  Future<void> fetchHealthInfo() async {
+  Future<void> fetchdoctorInfo() async {
     setState(() => _isLoading = true);
     try {
-      final info = await apiService.getHealthRecommendation(widget.patient!.diagnosis);
+      final Map<String, dynamic> info = await apiService.getProfile();
       print("HEALTH INFO : $info");
 
+
       setState(() {
-        healthInfo = info;
+        doctorInfo = parseDoctor(info);
       });
     } catch (e) {
       print('Error fetching health information: $e');
-      setState(() {
-        healthInfo = {
-          'title': 'Error',
-          'summary': 'Failed to load health information. Please check your internet connection.',
-          'url': '',
-          'recommendation': 'Please consult with a healthcare professional for accurate information.',
-        };
-      });
-    } finally {
+     } finally {
       setState(() => _isLoading = false);
     }
   }
@@ -81,7 +76,7 @@ class _PatientDetailsState extends State<PatientDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Patient Details"),
+        title: const Text("Profile"),
         backgroundColor: primcolor,
       ),
       body: ModalProgressHUD(
@@ -102,7 +97,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                       radius: 60,
                       backgroundColor: primcolor,
                       child: Text(
-                        widget.patient?.name[0].toUpperCase() ?? '',
+                        doctorInfo.username[0].toUpperCase() ?? '',
                         style: const TextStyle(
                           fontSize: 48,
                           color: secondarytextcolor,
@@ -118,7 +113,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                     children: [
                       Center(
                         child: Text(
-                          widget.patient?.name ?? 'Unknown',
+                          doctorInfo?.name ?? 'Unknown',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -129,43 +124,16 @@ class _PatientDetailsState extends State<PatientDetails> {
                       const SizedBox(height: 20),
                       _buildInfoRow(
                         "Date of Birth",
-                        widget.patient?.dateOfBirth != null
-                            ? DateFormat('yyyy-MM-dd').format(widget.patient!.dateOfBirth)
+                        doctorInfo?.dateOfBirth != null
+                            ? DateFormat('yyyy-MM-dd').format(doctorInfo!.dateOfBirth)
                             : 'Unknown',
                       ),
-                      _buildInfoRow("Phone", widget.patient?.phone ?? 'Unknown'),
-                      _buildInfoRow("Email", widget.patient?.email ?? 'Unknown'),
-                      _buildInfoRow("Address", widget.patient?.address ?? 'Unknown'),
-                      _buildInfoRow("Diagnosis", widget.patient?.diagnosis ?? 'Unknown'),
-                      _buildInfoRow(
-                        "Expenses",
-                        widget.patient?.formattedExpenses != null
-                            ? "\$${widget.patient!.formattedExpenses}"
-                            : 'Unknown',
-                      ),
-                      _buildInfoRow("Status", widget.patient?.status ?? 'Unknown'),
-                      const SizedBox(height: 30),
-                      const Text(
-                        "Health Information",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        healthInfo['title'] ?? 'Loading...',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(healthInfo['summary'] ?? 'No summary available'),
-                      const SizedBox(height: 10),
-                      Text(
-                        healthInfo['recommendation'] ?? 'No recommendation available',
-                        style: const TextStyle(fontStyle: FontStyle.italic),
-                      ),
-                      if (healthInfo['url'] != null && healthInfo['url'].isNotEmpty)
-                        ElevatedButton(
-                          onPressed: () => launchUrl(Uri.parse(healthInfo['url'])),
-                          child: const Text('Learn More'),
-                        ),
+                      _buildInfoRow("Phone", doctorInfo?.phone ?? 'Unknown'),
+                      _buildInfoRow("Email", doctorInfo?.email ?? 'Unknown'),
+                      _buildInfoRow("Address", doctorInfo?.address ?? 'Unknown'),
+                      _buildInfoRow("Diagnosis", doctorInfo?.diagnosis ?? 'Unknown'),
+                      _buildInfoRow("Status", doctorInfo?.status ?? 'Unknown'),
+                    
                     ],
                   ),
                 ),

@@ -75,11 +75,7 @@ class _OptVerificationState extends State<OptVerification> {
   }
 
   User user = User(
-    '',
-    '',
-    '',
-    '',
-    '',
+     username: '', cardnumber: '', email: '', password: '', otp: '',
   );
 
   @override

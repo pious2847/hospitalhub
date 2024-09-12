@@ -82,11 +82,7 @@ class _SigninState extends State<Signin> {
   }
 
   User user = User(
-    '',
-    '',
-    '',
-    '',
-    '',
+     username: '', cardnumber: '', email: '', password: '', otp: '',
   );
 
   @override

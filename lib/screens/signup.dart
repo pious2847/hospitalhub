@@ -34,7 +34,7 @@ class _SignupState extends State<Signup> {
       "email" + user.email,
     );
     print(
-      'Password' + user.password,
+      'Password${user.password}',
     );
     try {
       final response = await dio.post(
@@ -80,11 +80,7 @@ class _SignupState extends State<Signup> {
   }
 
   User user = User(
-    '',
-    '',
-    '',
-    '',
-    '',
+     username: '', cardnumber: '', email: '', password: '', otp: '',
   );
 
   @override
