@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hospitalhub/.env.dart';
+import 'package:hospitalhub/model/patientreport.dart';
 import 'package:hospitalhub/model/user_model.dart';
 import 'package:hospitalhub/screens/patientDetails.dart';
+import 'package:hospitalhub/screens/report.dart';
+import 'package:hospitalhub/service/apiservices.dart';
 import 'package:hospitalhub/widgets/colors.dart';
 import 'package:hospitalhub/widgets/messages.dart';
 import 'package:hospitalhub/widgets/patientModal.dart';
@@ -18,19 +21,49 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Patient> patients = [];
+  PatientReport? report;  // Change this line
   bool isLoading = true;
   final _dio = Dio();
+  final apiservice = ApiService();
 
   @override
   void initState() {
     super.initState();
-    fetchPatients();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
+    await Future.wait([
+      fetchPatients(),
+      fetchReport(),
+    ]);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> fetchReport() async {
+    try {
+      final reportData = await apiservice.fetchReport();
+      setState(() {
+        report = PatientReport.fromJson(reportData);
+      });
+    } catch (e) {
+      print('Error fetching report: $e');
+      ToastMsg.showErrorToast(
+          "Error fetching report. Please check your internet connection.");
+    }
   }
 
   List<Patient> parsePatients(Map<String, dynamic> responseData) {
     List<dynamic> patientsJson = responseData['patients'];
     return patientsJson.map((json) => Patient.fromJson(json)).toList();
   }
+
+
 
   Future<void> fetchPatients() async {
     setState(() {
@@ -97,6 +130,9 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   PatientCountCard(patientCount: patients.length),
                   const SizedBox(height: 24),
+                if (report != null) ReportSummary(report: report!),
+                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   Text(
                     'Patient List',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -133,7 +169,8 @@ class _HomePageState extends State<HomePage> {
           );
         },
         icon: const Icon(Icons.add, color: secondarytextcolor),
-        label: const Text('Add Patient', style: TextStyle(color: secondarytextcolor)),
+        label: const Text('Add Patient',
+            style: TextStyle(color: secondarytextcolor)),
         backgroundColor: primcolorlight,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -225,10 +262,13 @@ class PatientListItem extends StatelessWidget {
         subtitle: Text(patient.status),
         trailing: const Icon(Iconsax.arrow_right_3_copy, color: primcolor),
         onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PatientDetails(patient: patient,)),
-        );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PatientDetails(
+                      patient: patient,
+                    )),
+          );
         },
       ),
     );

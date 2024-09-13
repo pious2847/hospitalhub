@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/service/general.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final Dio _dio;
@@ -34,6 +33,17 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> fetchReport() async {
+  final response = await _dio.get('$APIURL/doctor/report');
+
+    if (response.statusCode == 200) {
+        final result = response.data;
+        return result;
+  } else {
+    throw Exception('Failed to load report');
+  }
+  }
+  
   Future<Map<String, dynamic>> getHealthRecommendation(String condition) async {
     try {
       final response = await _dio.get(

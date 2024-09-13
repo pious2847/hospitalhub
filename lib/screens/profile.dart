@@ -3,11 +3,9 @@ import 'package:hospitalhub/service/apiservices.dart';
 import 'package:hospitalhub/widgets/colors.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../model/user_model.dart';
-import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
-
-  const ProfilePage({super.key, });
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -15,32 +13,25 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = false;
-  List<User> doctorInfo = [];
+  User? doctorInfo;
   final ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    fetchdoctorInfo();
-  }
-    List<User> parseDoctor(Map<String, dynamic> responseData) {
-    List<dynamic> doctorJson = responseData['doctor'];
-    return doctorJson.map((json) => User.fromJson(json)).toList();
+    fetchDoctorInfo();
   }
 
-  Future<void> fetchdoctorInfo() async {
+  Future<void> fetchDoctorInfo() async {
     setState(() => _isLoading = true);
     try {
       final Map<String, dynamic> info = await apiService.getProfile();
-      print("HEALTH INFO : $info");
-
-
       setState(() {
-        doctorInfo = parseDoctor(info);
+        doctorInfo = User.fromJson(info['doctor']);
       });
     } catch (e) {
-      print('Error fetching health information: $e');
-     } finally {
+      print('Error fetching doctor information: $e');
+    } finally {
       setState(() => _isLoading = false);
     }
   }
@@ -52,19 +43,19 @@ class _ProfilePageState extends State<ProfilePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 120,
             child: Text(
               label,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 24, 17, 17),
+                color: Colors.grey,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: primarytextcolor),
+              style: const TextStyle(color: Colors.black87),
             ),
           ),
         ],
@@ -76,7 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: const Text("Doctor Profile"),
         backgroundColor: primcolor,
       ),
       body: ModalProgressHUD(
@@ -87,54 +78,62 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  decoration: const BoxDecoration(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
                     color: primcolorlight,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
                   ),
                   child: Center(
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: primcolor,
-                      child: Text(
-                        doctorInfo.username[0].toUpperCase() ?? '',
-                        style: const TextStyle(
-                          fontSize: 48,
-                          color: secondarytextcolor,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: primcolor,
+                          child: Text(
+                            doctorInfo?.username.isNotEmpty == true
+                                ? doctorInfo!.username[0].toUpperCase()
+                                : '',
+                            style: const TextStyle(
+                              fontSize: 36,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        Text(
+                          doctorInfo?.username ?? 'Unknown',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Text(
-                          doctorInfo?.name ?? 'Unknown',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: primarytextcolor,
-                          ),
-                        ),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoRow("Card Number", doctorInfo?.cardnumber ?? 'Unknown'),
+                          _buildInfoRow("Email", doctorInfo?.email ?? 'Unknown'),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      _buildInfoRow(
-                        "Date of Birth",
-                        doctorInfo?.dateOfBirth != null
-                            ? DateFormat('yyyy-MM-dd').format(doctorInfo!.dateOfBirth)
-                            : 'Unknown',
-                      ),
-                      _buildInfoRow("Phone", doctorInfo?.phone ?? 'Unknown'),
-                      _buildInfoRow("Email", doctorInfo?.email ?? 'Unknown'),
-                      _buildInfoRow("Address", doctorInfo?.address ?? 'Unknown'),
-                      _buildInfoRow("Diagnosis", doctorInfo?.diagnosis ?? 'Unknown'),
-                      _buildInfoRow("Status", doctorInfo?.status ?? 'Unknown'),
-                    
-                    ],
+                    ),
                   ),
                 ),
               ],
