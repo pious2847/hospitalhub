@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hospitalhub/screens/home.dart';
 import 'package:hospitalhub/screens/patients.dart';
+import 'package:hospitalhub/screens/profile.dart';
 import 'package:hospitalhub/widgets/custom_bottom_navigation_bar.dart';
 
 class MainPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const HomePage(),
     const PatientsPage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {

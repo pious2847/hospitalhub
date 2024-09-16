@@ -21,12 +21,11 @@ class User {
       'email': email,
     };
   }
-
-  factory User.fromJson(Map<String, dynamic> json) {
+ factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      username: json['username'],
-      cardnumber: json['cardnumber'],
-      email: json['email'],
+      username: json['fullName'] ?? '',
+      cardnumber: json['cardnumber'] ?? '',
+      email: json['email'] ?? '',
     );
   }
 }

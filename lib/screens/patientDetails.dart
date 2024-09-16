@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hospitalhub/screens/refer_patients.dart';
 import 'package:hospitalhub/service/apiservices.dart';
 import 'package:hospitalhub/widgets/colors.dart';
 import 'package:hospitalhub/widgets/patientModal.dart';
@@ -184,7 +186,35 @@ class _PatientDetailsState extends State<PatientDetails> {
                             ),
                           ),
                         ],
-                      )
+                      ),
+                      SizedBox(
+                        height: 50,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: secondarytextcolor,
+                          backgroundColor: primcolorlight,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        onPressed: () async {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ReferPatients(patient: widget.patient,);
+                            },
+                          );
+                        },
+                        child: Text(
+                          'Refer Patient',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

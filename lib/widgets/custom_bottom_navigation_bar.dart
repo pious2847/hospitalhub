@@ -6,10 +6,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
   final Function(int) onTap;
 
   const CustomBottomNavigationBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +28,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
           icon: Icon(Iconsax.user),
           label: 'Patients',
           tooltip: "Patients"
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Iconsax.share),
-          label: 'Refers',
-          tooltip: "Refers"
         ),
         BottomNavigationBarItem(
           icon: Icon(Iconsax.user_octagon),

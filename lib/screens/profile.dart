@@ -129,6 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          _buildInfoRow("Full Name", doctorInfo?.username ?? 'Unknown'),
                           _buildInfoRow("Card Number", doctorInfo?.cardnumber ?? 'Unknown'),
                           _buildInfoRow("Email", doctorInfo?.email ?? 'Unknown'),
                         ],
