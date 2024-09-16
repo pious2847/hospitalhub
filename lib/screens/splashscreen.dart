@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hospitalhub/screens/home.dart';
+// import 'package:hospitalhub/screens/home.dart';
+import 'package:hospitalhub/screens/mainpage.dart';
 import 'package:hospitalhub/widgets/colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:hospitalhub/screens/onboarding.dart';
@@ -36,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => showHome ? const HomePage() : const Onbording(),
+            builder: (_) => showHome ? const MainPage() : const Onbording(),
           ),
         );
       });

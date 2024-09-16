@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:hospitalhub/screens/forgotpass.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hospitalhub/screens/mainpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -58,7 +59,7 @@ class _SigninState extends State<Signin> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => MainPage()),
         );
         const resMsg = 'Welcome Back !!!';
         ToastMsg.showSuccessToast(" $resMsg,");

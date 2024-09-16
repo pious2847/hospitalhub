@@ -34,63 +34,37 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> fetchReport() async {
-  final response = await _dio.get('$APIURL/doctor/report');
-
-    if (response.statusCode == 200) {
-        final result = response.data;
-        return result;
-  } else {
-    throw Exception('Failed to load report');
-  }
-  }
-  
-  Future<Map<String, dynamic>> getHealthRecommendation(String condition) async {
     try {
-      final response = await _dio.get(
-        'https://healthy-api.p.rapidapi.com/symptom-checker',
-        queryParameters: {
-          'symptom': condition, // Pass the patient's condition or diagnosis
-        },
-        options: Options(
-          headers: {
-            'X-RapidAPI-Host': 'healthy-api.p.rapidapi.com',
-            'X-RapidAPI-Key': '', // No API key required for this API
-          },
-        ),
-      );
+      final response = await _dio.get('$APIURL/patients/reports');
+        print("The Analysez response is $response");
 
       if (response.statusCode == 200) {
-        final data = response.data;
-        final title = data['name'] ?? 'Unknown';
-        final summary = data['description'] ?? 'No summary available';
-        final url = data['link'] ?? '';
-
-        return {
-          'title': title,
-          'summary': summary,
-          'url': url,
-          'recommendation':
-              'Based on the information about $title, it is recommended to consult with a healthcare professional for proper diagnosis and treatment. For more details, visit: $url',
-        };
+        final result = response.data['report'];
+        print("The Analysez report is $result");
+        return result;
       } else {
-        return {
-          'title': 'No information found',
-          'summary': 'No summary available for the given condition.',
-          'url': '',
-          'recommendation':
-              'Please consult with a healthcare professional for accurate information about your condition.',
-        };
+        throw Exception('Failed to load report');
       }
     } catch (e) {
-      print('Error occurred: $e');
+        print("Exception: $e");
       return {
-        'title': 'Error',
-        'summary':
-            'Failed to load health information. Please check your internet connection.',
-        'url': '',
-        'recommendation':
-            'Please consult with a healthcare professional for accurate information.',
+        'message': 'Error: $e',
       };
+    }
+  }
+
+  Future<void> deletePatient(String patientId) async {
+    try {
+      final response = await _dio.delete(
+        '$APIURL/patients/$patientId',  );
+
+      if (response.statusCode == 200) {
+       
+     }
+       
+    } catch (e) {
+      print('Error occurred: $e');
+   
     }
   }
 }

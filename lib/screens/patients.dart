@@ -2,30 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:hospitalhub/.env.dart';
 import 'package:hospitalhub/model/patientreport.dart';
 import 'package:hospitalhub/model/user_model.dart';
+import 'package:hospitalhub/screens/home.dart';
 import 'package:hospitalhub/screens/patientDetails.dart';
-import 'package:hospitalhub/screens/patients.dart';
 import 'package:hospitalhub/screens/report.dart';
 import 'package:hospitalhub/service/apiservices.dart';
 import 'package:hospitalhub/widgets/colors.dart';
+import 'package:hospitalhub/widgets/custom_bottom_navigation_bar.dart';
 import 'package:hospitalhub/widgets/messages.dart';
 import 'package:hospitalhub/widgets/patientModal.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class PatientsPage extends StatefulWidget {
+  const PatientsPage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _PatientsPageState createState() => _PatientsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _PatientsPageState extends State<PatientsPage> {
   List<Patient> patients = [];
-  PatientReport? report; // Change this line
+  PatientReport? report;  // Change this line
   bool isLoading = true;
   final _dio = Dio();
   final apiservice = ApiService();
+
 
   @override
   void initState() {
@@ -63,6 +65,8 @@ class _HomePageState extends State<HomePage> {
     List<dynamic> patientsJson = responseData['patients'];
     return patientsJson.map((json) => Patient.fromJson(json)).toList();
   }
+
+
 
   Future<void> fetchPatients() async {
     setState(() {
@@ -108,17 +112,14 @@ class _HomePageState extends State<HomePage> {
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: const Text('Patient Management',
+              title: const Text('Patients',
                   style: TextStyle(color: Color.fromARGB(255, 32, 32, 32))),
               background: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color.fromARGB(255, 79, 165, 236),
-                      Color.fromARGB(255, 10, 71, 141)
-                    ],
+                    colors: [Color.fromARGB(255, 79, 165, 236), Color.fromARGB(255, 10, 71, 141)],
                   ),
                 ),
               ),
@@ -130,31 +131,12 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PatientCountCard(patientCount: patients.length),
-                  const SizedBox(height: 24),
-                  if (report != null) ReportSummary(report: report!),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Recent Patients',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: primcolor,
-                            ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const PatientsPage()),
-                          );
-                        },
-                        child: const Text('View All'),
-                      ),
-                    ],
+                  Text(
+                    'Patient List',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: primcolor,
+                        ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -170,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                     (context, index) {
                       return PatientListItem(patient: patients[index]);
                     },
-                    childCount: patients.length > 5 ? 5 : patients.length,
+                    childCount: patients.length,
                   ),
                 ),
         ],

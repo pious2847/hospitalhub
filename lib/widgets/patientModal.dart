@@ -81,6 +81,9 @@ class _PatientModalState extends State<PatientModal> {
         } else {
           await dio.put('$APIURL/patients/${widget.patient!.id}', data: patient.toJson());
         }
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Patient added successfully')),
+        );
         Navigator.of(context).pop(true); // Return true to indicate success
       } catch (e) {
         print("Error saving patient: $e");
@@ -214,7 +217,7 @@ class _PatientModalState extends State<PatientModal> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _savePatient,
-                        child: Text(widget.patient == null ? 'Save' : 'Update'),
+                        child: Text(widget.patient == null ? 'Save' : 'Update', style: TextStyle(color: secondarytextcolor),),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primcolor,
                           padding: EdgeInsets.symmetric(vertical: 16),

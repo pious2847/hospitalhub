@@ -24,12 +24,12 @@ class ReportSummary extends StatelessWidget {
                     color: primcolor,
                   ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             SizedBox(
               height: 200,
               child: TopDiagnosesChart(topDiagnoses: report.topDiagnoses),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 50),
             SizedBox(
               height: 200,
               child: PatientStatusChart(overallStatistics: report.overallStatistics),
