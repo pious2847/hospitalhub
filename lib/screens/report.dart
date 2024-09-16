@@ -10,32 +10,30 @@ class ReportSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Patient Report Summary',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: primcolor,
-                  ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 200,
-              child: TopDiagnosesChart(topDiagnoses: report.topDiagnoses),
-            ),
-            const SizedBox(height: 50),
-            SizedBox(
-              height: 200,
-              child: PatientStatusChart(overallStatistics: report.overallStatistics),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Patient Report Summary',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: primcolor,
+                ),
+          ),
+          const SizedBox(height: 30),
+          SizedBox(
+            height: 200,
+            child: TopDiagnosesChart(topDiagnoses: report.topDiagnoses),
+          ),
+          const SizedBox(height: 50),
+          SizedBox(
+            height: 200,
+            child: PatientStatusChart(overallStatistics: report.overallStatistics),
+          ),
+          const SizedBox(height: 50),
+        ],
       ),
     );
   }

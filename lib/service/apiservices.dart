@@ -36,11 +36,9 @@ class ApiService {
   Future<Map<String, dynamic>> fetchReport() async {
     try {
       final response = await _dio.get('$APIURL/patients/reports');
-        print("The Analysez response is $response");
 
       if (response.statusCode == 200) {
         final result = response.data['report'];
-        print("The Analysez report is $result");
         return result;
       } else {
         throw Exception('Failed to load report');
