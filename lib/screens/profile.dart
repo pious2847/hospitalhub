@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hospitalhub/service/apiservices.dart';
+import 'package:hospitalhub/service/general.dart';
 import 'package:hospitalhub/widgets/colors.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../model/user_model.dart';
+import 'login.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -129,11 +132,42 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildInfoRow("Full Name", doctorInfo?.username ?? 'Unknown'),
-                          _buildInfoRow("Card Number", doctorInfo?.cardnumber ?? 'Unknown'),
-                          _buildInfoRow("Email", doctorInfo?.email ?? 'Unknown'),
+                          _buildInfoRow(
+                              "Full Name", doctorInfo?.username ?? 'Unknown'),
+                          _buildInfoRow("Card Number",
+                              doctorInfo?.cardnumber ?? 'Unknown'),
+                          _buildInfoRow(
+                              "Email", doctorInfo?.email ?? 'Unknown'),
                         ],
                       ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0.0,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: const BorderSide(color: primcolorlight, width: 1.0),
+                    ),
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  onPressed: () async {
+                    await logout();
+                    Navigator.pushReplacement(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const Signin(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'Logout',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
                     ),
                   ),
                 ),
